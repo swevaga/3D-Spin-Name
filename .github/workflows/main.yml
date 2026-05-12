@@ -2,29 +2,40 @@ name: Deploy Vite Site
 on:
   push:
     branches: ["main"]
+
 permissions:
   contents: read
   pages: write
   id-token: write
+
+# Solusi utama: Memaksa runner menggunakan Node 24 untuk menjalankan actions
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4 # Tetap v4 tidak apa-apa karena sudah dipaksa lewat 'env' di atas
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 20 # Tetap gunakan 20 jika aplikasi Vite Anda butuh versi ini
           cache: 'npm'
+
       - name: Install dependencies
         run: npm install
+
       - name: Build
         run: npm run build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
